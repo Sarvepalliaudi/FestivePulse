@@ -331,12 +331,39 @@ python -m unittest discover tests
 
 ---
 
+## ☁️ Streamlit Community Cloud Free Hosting Guide
+
+FestivePulse is configured for one-click deployment on **Streamlit Community Cloud**:
+
+### 1. Step-by-Step Deployment Steps
+1. Push your code to GitHub: `https://github.com/Sarvepalliaudi/FestivePulse.git` on the `main` branch.
+2. Sign in to [share.streamlit.io](https://share.streamlit.io/) with your GitHub account (`Sarvepalliaudi`).
+3. Click **"New app"** (or **"Create app"**).
+4. Fill in the deployment form:
+   - **Repository**: `Sarvepalliaudi/FestivePulse`
+   - **Branch**: `main`
+   - **Main file path**: `app.py`
+   - **App URL** (Optional): Choose a custom subdomain (e.g. `festivepulse.streamlit.app`).
+5. Click **"Deploy!"**.
+6. Streamlit Cloud will automatically install dependencies from `requirements.txt` and launch the app.
+
+### 2. Configuration & Secrets
+- **No external API keys or secrets are required** for default operation because FestivePulse is 100% deterministic and non-AI.
+- If you need custom environment variables in the future, configure them in the Streamlit Cloud dashboard under **App Settings > Secrets** using TOML format.
+
+### 3. ⚠️ Cloud Database Persistence & Privacy Notice
+> [!WARNING]
+> **Ephemeral Storage Notice:** Streamlit Community Cloud runs in stateless, ephemeral Linux containers.
+> - Any sales, products, or stock transactions recorded through the public web interface will persist **only while the container is actively running**.
+> - When the container reboots, updates, or goes to sleep due to inactivity, local storage (`festivepulse.db`) resets back to the initial seeded demo state.
+> - **Privacy:** Do not enter real-world confidential customer records or private financial data on a public Streamlit Cloud deployment.
+> - **Production Deployment:** For permanent live store operations, run FestivePulse locally on a dedicated PC/laptop (where SQLite is permanent and offline-first) or connect to an external persistent database (such as PostgreSQL).
+
+---
+
 ## 👨‍💻 Author & Developer
 
 **Audi Siva Bhanuvardhan Sarvepalli**  
 🔗 LinkedIn: [linkedin.com/in/audi-siva-bhanuvardhan-sarvepalli-4598a8289](https://www.linkedin.com/in/audi-siva-bhanuvardhan-sarvepalli-4598a8289/)  
 
 *FestivePulse — Designed and engineered for Indian small-business retailers, distributors, and warehouse operators.*
-
-
-
