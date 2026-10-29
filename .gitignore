@@ -1,0 +1,48 @@
+# FestivePulse AI — Source Control Exclusions & Secret Protection
+
+# Environment variables & secrets
+.env
+*.env
+.env.*
+secrets/
+*.pem
+*.key
+*.crt
+
+# SQLite Databases & Backups (Local State)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.bak
+*.backup
+data/backups/
+backups/
+
+# Reports & Exports
+reports/*.pdf
+reports/*.csv
+*.log
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
