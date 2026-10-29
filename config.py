@@ -18,6 +18,7 @@ APP_NAME = "FestivePulse"
 APP_TAGLINE = "Festival Sales & Inventory Command Center for Indian Retailers"
 APP_ICON = "🪔"
 VERSION = "1.0.0"
+APP_VERSION = "1.0.0"
 
 # Currency & Formatting
 CURRENCY_SYMBOL = "₹"

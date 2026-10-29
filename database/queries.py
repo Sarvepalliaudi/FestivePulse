@@ -168,6 +168,9 @@ def get_products_with_stock(category_id: Optional[int] = None, festival_tag: Opt
     return df
 
 
+get_products = get_products_with_stock
+
+
 def get_batches_for_product(product_id: int) -> pd.DataFrame:
     sql = """
         SELECT b.*, s.supplier_name,

@@ -496,7 +496,7 @@ with pos_tabs[2]:
         corr_invoices_df = get_sales_report_df(status="COMPLETED", limit=100)
         if not corr_invoices_df.empty:
             corr_opts = {
-                f"{r['invoice_number']} — ₹{r['net_total_amount']:.2f} ({r['customer_name'] or 'Walk-in'}) [Date: {r['sale_date']}]": r["invoice_id"]
+                f"{r['invoice_number']} — ₹{r['net_total_amount']:.2f} ({r['customer_name'] or 'Walk-in'}) [Date: {r['invoice_date']}]": r["invoice_id"]
                 for _, r in corr_invoices_df.iterrows()
             }
             sel_corr_label = st.selectbox("Select invoice to correct / re-issue:", list(corr_opts.keys()), key="sel_corr_inv")

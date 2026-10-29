@@ -10,6 +10,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import date
 from database.queries import get_all_festival_occurrences, query_df
+from services.currency_utils import format_inr
 from services.expense_service import (
     record_expense,
     edit_expense,

@@ -8,7 +8,7 @@ Budget constraint analysis, top-contributor excess explanations, and manual over
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.queries import get_all_festival_occurrences, get_categories, get_products
+from database.queries import get_all_festival_occurrences, get_categories, get_products_with_stock
 from services.stock_planning_service import generate_festival_stock_plan_table
 from services.pdf_generator import generate_procurement_po_pdf
 from services.currency_utils import format_inr
@@ -105,7 +105,7 @@ with col_fil1:
     cat_arg = None if filter_cat == 0 else filter_cat
 
 # Fetch active products matching category
-all_prods_df = get_products(category_id=cat_arg)
+all_prods_df = get_products_with_stock(category_id=cat_arg)
 active_prods = all_prods_df[all_prods_df["is_active"] == 1] if not all_prods_df.empty else pd.DataFrame()
 
 with col_fil2:
