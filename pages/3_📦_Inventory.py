@@ -38,11 +38,11 @@ val_metrics = get_inventory_valuation_metrics()
 v1, v2, v3, v4, v5, v6 = st.columns(6)
 
 with v1:
-    render_kpi_card("Stock Valuation (Cost)", format_inr(val_metrics["total_cost_value"]), "Capital Invested in Stock")
+    render_kpi_card("Stock Valuation (Cost)", format_inr(val_metrics["total_cost_value"], show_decimals=False), "Capital Invested in Stock")
 with v2:
-    render_kpi_card("Retail Valuation (Sell)", format_inr(val_metrics["total_retail_value"]), "Potential Gross Revenue")
+    render_kpi_card("Retail Valuation (Sell)", format_inr(val_metrics["total_retail_value"], show_decimals=False), "Potential Gross Revenue")
 with v3:
-    render_kpi_card("Unrealized Margin", format_inr(val_metrics["potential_margin"]), "Projected Gross Margin")
+    render_kpi_card("Unrealized Margin", format_inr(val_metrics["potential_margin"], show_decimals=False), "Projected Gross Margin")
 with v4:
     render_kpi_card("Total Units in Stock", f"{val_metrics['total_units_in_stock']:,}", "Active Units Available")
 with v5:

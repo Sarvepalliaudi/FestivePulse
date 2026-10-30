@@ -26,7 +26,8 @@ from services.currency_utils import format_inr
 from services.ui_components import (
     apply_custom_css,
     render_festival_header,
-    render_standard_sidebar
+    render_standard_sidebar,
+    clean_html
 )
 from services.reports_service import (
     get_sales_summary_data,
@@ -101,16 +102,17 @@ def render_report_header_and_downloads(
 ):
     """Renders classification badge, definitions expander, KPI cards, and CSV/PDF download buttons."""
     is_estimate = "ESTIMATE" in meta.get("classification", "")
-    badge_color = "#EA580C" if is_estimate else "#059669"
-    badge_bg = "#FFEDD5" if is_estimate else "#D1FAE5"
+    badge_color = "#F59E0B" if is_estimate else "#10B981"
+    badge_bg = "rgba(245, 158, 11, 0.12)" if is_estimate else "rgba(16, 185, 129, 0.12)"
+    badge_border = "rgba(245, 158, 11, 0.4)" if is_estimate else "rgba(16, 185, 129, 0.4)"
 
     st.markdown(
-        f"""
-        <div style="background-color: {badge_bg}; border-left: 5px solid {badge_color}; padding: 10px 14px; border-radius: 4px; margin-bottom: 12px;">
-            <span style="font-weight: 700; color: {badge_color}; font-size: 0.92rem;">● DATA CLASSIFICATION: {meta['classification']}</span><br/>
-            <span style="color: #475569; font-size: 0.82rem;">Generated: <b>{meta['generated_at']}</b> | Currency: <b>{meta['currency']} (Indian Rupee)</b></span>
+        clean_html(f"""
+        <div style="background-color: {badge_bg}; border: 1px solid {badge_border}; border-left: 5px solid {badge_color}; padding: 10px 16px; border-radius: 8px; margin-bottom: 14px;">
+            <div style="font-weight: 700; color: {badge_color}; font-size: 0.92rem; letter-spacing: 0.02em;">● DATA CLASSIFICATION: {meta['classification']}</div>
+            <div style="color: #CBD5E1; font-size: 0.82rem; margin-top: 3px;">Generated: <b style="color: #FFFFFF;">{meta['generated_at']}</b> | Currency: <b style="color: #FFFFFF;">{meta['currency']} (Indian Rupee)</b></div>
         </div>
-        """,
+        """),
         unsafe_allow_html=True
     )
 

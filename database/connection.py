@@ -9,6 +9,18 @@ from typing import Generator
 import pandas as pd
 from config import DATABASE_PATH, SCHEMA_PATH
 
+# Register numpy data types with sqlite3 so that pandas int64/float64 bind correctly in queries
+try:
+    import numpy as np
+    sqlite3.register_adapter(np.int64, int)
+    sqlite3.register_adapter(np.int32, int)
+    sqlite3.register_adapter(np.int16, int)
+    sqlite3.register_adapter(np.int8, int)
+    sqlite3.register_adapter(np.float64, float)
+    sqlite3.register_adapter(np.float32, float)
+except ImportError:
+    pass
+
 
 def get_db_connection() -> sqlite3.Connection:
     """

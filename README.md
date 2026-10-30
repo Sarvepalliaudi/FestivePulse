@@ -45,22 +45,25 @@
 
 ## 🚀 Quick Start Guide
 
-### 1. Requirements
+### 1. Requirements & Dependencies
 - Python 3.10+
 - Installed libraries: `streamlit`, `pandas`, `plotly`, `reportlab`
 
+Install dependencies universally:
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### 2. Launch the Application
-Navigate to the project root and start Streamlit:
+Run via Python's module runner (compatible with Windows, macOS, Linux, and Cloud):
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-The application will launch in your browser at `http://localhost:8501`.
+- **Local PC / Mac Access:** Open `http://localhost:8501` in your browser.
+- **Mobile Phone / Tablet Access:** Connect your phone to the same local Wi-Fi / LAN network and open `http://<your-computer-ip>:8501`.
+- **Cloud Deployment:** Directly deployable on Streamlit Community Cloud, Docker, VPS, Render, or Railway with `.streamlit/config.toml` pre-configured.
 
 ### 3. Running Unit Tests
 ```bash

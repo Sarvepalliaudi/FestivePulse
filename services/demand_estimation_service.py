@@ -37,6 +37,9 @@ def parse_date_str(val: Any) -> Optional[date]:
 
 def get_festival_occurrence_details(occurrence_id: int) -> Optional[Dict[str, Any]]:
     """Fetches metadata and duration for a festival occurrence."""
+    if occurrence_id is None:
+        return None
+    occ_int = int(occurrence_id)
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
@@ -47,7 +50,7 @@ def get_festival_occurrence_details(occurrence_id: int) -> Optional[Dict[str, An
             FROM festival_occurrences o
             JOIN festivals f ON o.festival_id = f.festival_id
             WHERE o.occurrence_id = ?
-        """, (occurrence_id,))
+        """, (occ_int,))
         row = cursor.fetchone()
         if not row:
             return None
@@ -114,6 +117,8 @@ def estimate_product_demand(
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
+        p_id = int(product_id)
+        target_occ_id = int(target_occurrence_id)
 
         # 1. Product Master Data
         cursor.execute("""
@@ -122,7 +127,7 @@ def estimate_product_demand(
             FROM products p
             JOIN product_categories c ON p.category_id = c.category_id
             WHERE p.product_id = ?
-        """, (product_id,))
+        """, (p_id,))
         p_row = cursor.fetchone()
         if not p_row:
             raise ValueError(f"Product ID {product_id} not found in database.")
@@ -131,7 +136,7 @@ def estimate_product_demand(
         selling_price = float(p_row["selling_price"])
 
         # 2. Target Festival Occurrence Data
-        target_fest = get_festival_occurrence_details(target_occurrence_id)
+        target_fest = get_festival_occurrence_details(target_occ_id)
         if not target_fest:
             raise ValueError(f"Festival occurrence ID {target_occurrence_id} not found.")
 

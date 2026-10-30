@@ -25,7 +25,8 @@ from services.ui_components import (
     render_festival_header,
     render_kpi_card,
     get_festive_plotly_layout,
-    render_standard_sidebar
+    render_standard_sidebar,
+    clean_html
 )
 
 st.set_page_config(page_title="Expenses & Profit (P&L) — FestivePulse", page_icon="💰", layout="wide")
@@ -40,6 +41,16 @@ st.markdown(
     "Calculates net operating profit strictly from relevant included expenses, with explicit labeled exclusions. "
     "**100% Non-AI. Zero estimated guesswork.**"
 )
+
+# Standard Operating Expense Categories
+CAT_CHOICES = [
+    ("RENT", "Rent (Store, Stall, Warehouse)"),
+    ("TRANSPORT", "Transport & Freight (Logistics, Delivery)"),
+    ("PACKAGING", "Packaging (Boxes, Pouches, Bags, Foils)"),
+    ("WAGES", "Wages & Bonuses (Staff Overtime, Temporary Labor)"),
+    ("MARKETING", "Marketing & Promotion (Ads, Banners, Social Campaigns)"),
+    ("OTHER", "Other Costs (Utilities, Incidental Overheads)")
+]
 
 # 1. Festival & Scope Selection
 occ_df = get_all_festival_occurrences()
@@ -61,15 +72,7 @@ with col_filt1:
 occ_id_filter = None if selected_scope == "ALL" else int(selected_scope)
 
 with col_filt2:
-    exp_cats = [
-        ("ALL", "All Categories"),
-        ("RENT", "Rent (Store, Stall, Warehouse)"),
-        ("TRANSPORT", "Transport & Freight"),
-        ("PACKAGING", "Packaging & Boxes"),
-        ("WAGES", "Wages & Bonuses"),
-        ("MARKETING", "Marketing & Promotion"),
-        ("OTHER", "Other Costs & Utilities")
-    ]
+    exp_cats = [("ALL", "All Categories")] + CAT_CHOICES
     selected_cat_filter = st.selectbox("Expense Category Filter:", options=[c[0] for c in exp_cats], format_func=lambda x: dict(exp_cats)[x])
     cat_arg = None if selected_cat_filter == "ALL" else selected_cat_filter
 
@@ -94,21 +97,21 @@ p1, p2, p3, p4 = st.columns(4)
 with p1:
     render_kpi_card(
         "Net Sales Revenue",
-        format_inr(pnl["net_sales_revenue"]),
-        f"Gross: {format_inr(pnl['gross_billed'])} (Discounts: -{format_inr(pnl['total_discounts'])})"
+        format_inr(pnl["net_sales_revenue"], show_decimals=False),
+        f"Gross: {format_inr(pnl['gross_billed'], show_decimals=False)} (Discounts: -{format_inr(pnl['total_discounts'], show_decimals=False)})"
     )
 
 with p2:
     render_kpi_card(
         "Cost of Goods (COGS)",
-        format_inr(pnl["net_cogs"]),
+        format_inr(pnl["net_cogs"], show_decimals=False),
         f"Historical Snapshot Cost ({pnl['total_units_sold']} Units Net)"
     )
 
 with p3:
     render_kpi_card(
         "Included Expenses",
-        format_inr(pnl["total_included_expenses"]),
+        format_inr(pnl["total_included_expenses"], show_decimals=False),
         f"{len(pnl['included_expenses'])} items included" + (f" ({len(pnl['labeled_exclusions'])} excluded)" if pnl['has_exclusions'] else "")
     )
 
@@ -116,7 +119,7 @@ with p4:
     net_prof = pnl["net_operating_profit"]
     render_kpi_card(
         "Net Operating Profit",
-        format_inr(net_prof),
+        format_inr(net_prof, show_decimals=False),
         f"Margin: {pnl['net_margin_pct']:.1f}% | ROI: {pnl['festival_roi_pct']:.1f}%",
         is_good=net_prof >= 0
     )
@@ -139,7 +142,7 @@ with ep_tabs[0]:
 
     with col_pnl1:
         st.subheader("📑 Statement of Profit & Loss")
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div style="background: rgba(18, 24, 38, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 1.5rem;">
             <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06);">
                 <span style="color: #F8FAFC; font-weight: 600;">1. Gross Billed Sales:</span>
@@ -183,7 +186,7 @@ with ep_tabs[0]:
                 <span style="color: #FCD34D; font-weight: 700; font-size: 0.95rem;">{pnl['net_margin_pct']:.1f}% | ROI: {pnl['festival_roi_pct']:.1f}%</span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         # Labeled Exclusions Banner
         if pnl["has_exclusions"]:
@@ -235,15 +238,7 @@ with ep_tabs[1]:
     with st.form("form_add_expense_v2", clear_on_submit=True):
         col_x1, col_x2 = st.columns(2)
         with col_x1:
-            cat_choices = [
-                ("RENT", "Rent (Store, Stall, Warehouse)"),
-                ("TRANSPORT", "Transport & Freight (Logistics, Delivery)"),
-                ("PACKAGING", "Packaging (Boxes, Pouches, Bags, Foils)"),
-                ("WAGES", "Wages & Bonuses (Staff Overtime, Temporary Labor)"),
-                ("MARKETING", "Marketing & Promotion (Ads, Banners, Social Campaigns)"),
-                ("OTHER", "Other Costs (Utilities, Incidental Overheads)")
-            ]
-            chosen_cat = st.selectbox("Expense Category *", options=[c[0] for c in cat_choices], format_func=lambda x: dict(cat_choices)[x])
+            chosen_cat = st.selectbox("Expense Category *", options=[c[0] for c in CAT_CHOICES], format_func=lambda x: dict(CAT_CHOICES)[x])
             exp_amount = st.number_input("Amount (₹) *", min_value=1.0, max_value=5000000.0, step=500.0, value=5000.0)
             exp_date = st.date_input("Date Incurred *", value=date.today())
             exp_desc = st.text_input("Description *", placeholder="e.g. October Store Rent or 500 Gift Boxes")
@@ -369,7 +364,11 @@ with ep_tabs[3]:
             format_func=lambda x: exp_select_map[x]
         )
 
-        curr_exp = query_df("SELECT * FROM expenses WHERE expense_id = ?", (chosen_edit_id,)).iloc[0]
+        curr_exp_df = query_df("SELECT * FROM expenses WHERE expense_id = ?", (chosen_edit_id,))
+        if curr_exp_df.empty:
+            st.warning(f"Expense #{chosen_edit_id} record not found.")
+            st.stop()
+        curr_exp = curr_exp_df.iloc[0]
 
         col_ed1, col_ed2 = st.columns([1.2, 1.0])
 
@@ -377,12 +376,18 @@ with ep_tabs[3]:
             st.markdown(f"#### 🛠️ Edit / Correct Expense #{chosen_edit_id}")
             with st.form(f"form_edit_exp_{chosen_edit_id}"):
                 e_amt = st.number_input("Amount (₹) *", min_value=1.0, value=float(curr_exp["amount"]), step=500.0)
-                e_date = st.date_input("Date Incurred *", value=pd.to_datetime(curr_exp["expense_date"]).date())
+                parsed_e_date = pd.to_datetime(curr_exp["expense_date"], errors="coerce")
+                default_e_date = parsed_e_date.date() if pd.notnull(parsed_e_date) else date.today()
+                e_date = st.date_input("Date Incurred *", value=default_e_date)
+                
+                cat_keys = [c[0] for c in CAT_CHOICES]
+                norm_c = normalize_category(curr_exp.get("expense_category", "OTHER"))
+                cat_idx = cat_keys.index(norm_c) if norm_c in cat_keys else cat_keys.index("OTHER")
                 e_cat = st.selectbox(
                     "Category *",
-                    options=[c[0] for c in cat_choices],
-                    index=[c[0] for c in cat_choices].index(normalize_category(curr_exp["expense_category"])),
-                    format_func=lambda x: dict(cat_choices)[x]
+                    options=cat_keys,
+                    index=cat_idx,
+                    format_func=lambda x: dict(CAT_CHOICES)[x]
                 )
                 e_desc = st.text_input("Description *", value=str(curr_exp.get("description") or curr_exp.get("notes") or ""))
                 e_vendor = st.text_input("Vendor / Payee Name", value=str(curr_exp["vendor_name"] or ""))

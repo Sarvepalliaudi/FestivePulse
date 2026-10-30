@@ -405,6 +405,30 @@ class TestExpenseManagementAndPnL(unittest.TestCase):
         excl_mkt_ids = [x["expense_id"] for x in pnl_mkt["labeled_exclusions"]]
         self.assertIn(e1, excl_mkt_ids)
 
+    def test_normalize_category_canonical_mapping(self):
+        """Verifies that all primary categories and legacy aliases normalize to the 6 primary categories."""
+        expected = {
+            "RENT": "RENT",
+            "TEMPORARY_STALL_RENT": "RENT",
+            "TRANSPORT": "TRANSPORT",
+            "TRANSPORT_FREIGHT": "TRANSPORT",
+            "PACKAGING": "PACKAGING",
+            "PACKAGING_BOXES": "PACKAGING",
+            "WAGES": "WAGES",
+            "STAFF_BONUS_OVERTIME": "WAGES",
+            "MARKETING": "MARKETING",
+            "MARKETING_BANNERS_PAMPHLETS": "MARKETING",
+            "OTHER": "OTHER",
+            "FESTIVAL_DECORATION": "OTHER",
+            "UTILITIES_POWER": "OTHER",
+            "MISCELLANEOUS": "OTHER",
+            "": "OTHER",
+            None: "OTHER"
+        }
+        for raw, expected_canon in expected.items():
+            self.assertEqual(normalize_category(raw), expected_canon, f"Failed for category: {raw}")
+
 
 if __name__ == "__main__":
     unittest.main()
+

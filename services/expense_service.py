@@ -28,24 +28,39 @@ STANDARD_CATEGORIES = {
     "MISCELLANEOUS": "Other Costs (Miscellaneous)"
 }
 
+PRIMARY_CATEGORIES = ["RENT", "TRANSPORT", "PACKAGING", "WAGES", "MARKETING", "OTHER"]
+
+CATEGORY_ALIASES = {
+    "TEMPORARY_STALL_RENT": "RENT",
+    "TRANSPORT_FREIGHT": "TRANSPORT",
+    "PACKAGING_BOXES": "PACKAGING",
+    "STAFF_BONUS_OVERTIME": "WAGES",
+    "MARKETING_BANNERS_PAMPHLETS": "MARKETING",
+    "FESTIVAL_DECORATION": "OTHER",
+    "UTILITIES_POWER": "OTHER",
+    "MISCELLANEOUS": "OTHER",
+}
+
 
 def normalize_category(category: str) -> str:
-    """Normalizes category input to valid uppercase key."""
+    """Normalizes category input to one of the 6 canonical uppercase keys."""
     if not category:
         return "OTHER"
     c_upper = category.strip().upper()
-    if c_upper in STANDARD_CATEGORIES:
+    if c_upper in PRIMARY_CATEGORIES:
         return c_upper
+    if c_upper in CATEGORY_ALIASES:
+        return CATEGORY_ALIASES[c_upper]
     # Partial matching
-    if "RENT" in c_upper:
+    if "RENT" in c_upper or "STALL" in c_upper:
         return "RENT"
-    if "TRANSPORT" in c_upper or "FREIGHT" in c_upper or "LOGISTICS" in c_upper:
+    if "TRANSPORT" in c_upper or "FREIGHT" in c_upper or "LOGISTICS" in c_upper or "DELIVERY" in c_upper:
         return "TRANSPORT"
-    if "PACKAG" in c_upper or "BOX" in c_upper:
+    if "PACKAG" in c_upper or "BOX" in c_upper or "BAG" in c_upper or "POUCH" in c_upper:
         return "PACKAGING"
-    if "WAGE" in c_upper or "STAFF" in c_upper or "SALAR" in c_upper or "BONUS" in c_upper:
+    if "WAGE" in c_upper or "STAFF" in c_upper or "SALAR" in c_upper or "BONUS" in c_upper or "LABOR" in c_upper:
         return "WAGES"
-    if "MARKET" in c_upper or "AD" in c_upper or "PROMOT" in c_upper:
+    if "MARKET" in c_upper or "AD" in c_upper or "PROMOT" in c_upper or "BANNER" in c_upper:
         return "MARKETING"
     return "OTHER"
 

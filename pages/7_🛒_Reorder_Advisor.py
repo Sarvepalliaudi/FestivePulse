@@ -56,12 +56,15 @@ default_occ = next((r["occurrence_id"] for _, r in occ_df.iterrows() if r["is_cu
 st.subheader("⚙️ Campaign & Budget Parameters")
 col_cfg1, col_cfg2, col_cfg3 = st.columns([1.5, 1.2, 1.3])
 
+occ_keys = list(occ_options.keys())
+default_occ_idx = occ_keys.index(default_occ) if default_occ in occ_keys else 0
+
 with col_cfg1:
     target_occ = st.selectbox(
         "Target Festival & Planning Window:",
-        options=list(occ_options.keys()),
+        options=occ_keys,
         format_func=lambda x: occ_options[x],
-        index=list(occ_options.keys()).index(default_occ)
+        index=default_occ_idx
     )
     # Display selected occurrence details
     selected_occ_meta = occ_df[occ_df["occurrence_id"] == target_occ].iloc[0]

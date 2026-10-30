@@ -188,7 +188,7 @@ kpi_row2_col1, kpi_row2_col2, kpi_row2_col3 = st.columns(3)
 with kpi_row1_col1:
     render_kpi_card(
         label="Total Sales Revenue",
-        value=format_inr(kpis["total_sales"]),
+        value=format_inr(kpis["total_sales"], show_decimals=False),
         subtext=f"{kpis['invoice_count']} Invoices (Net of Returns)",
         delta="Filtered Scope" if (start_filter or selected_cat_id or selected_prod_id) else "Lifetime Net",
         is_good=True
@@ -197,7 +197,7 @@ with kpi_row1_col1:
 with kpi_row1_col2:
     render_kpi_card(
         label="Sales This Month",
-        value=format_inr(kpis["sales_this_month"]),
+        value=format_inr(kpis["sales_this_month"], show_decimals=False),
         subtext=f"Total in {kpis['current_month_name']}",
         delta="Current Pacing",
         is_good=True
@@ -206,7 +206,7 @@ with kpi_row1_col2:
 with kpi_row1_col3:
     render_kpi_card(
         label="Gross Profit",
-        value=format_inr(kpis["gross_profit"]),
+        value=format_inr(kpis["gross_profit"], show_decimals=False),
         subtext=f"Cost Data Available: {kpis['cost_coverage_pct']}% of items sold",
         delta="Profitable" if kpis["gross_profit"] > 0 else "No profit recorded",
         is_good=kpis["gross_profit"] >= 0
@@ -215,7 +215,7 @@ with kpi_row1_col3:
 with kpi_row2_col1:
     render_kpi_card(
         label="Current Inventory Valuation",
-        value=format_inr(kpis["current_inventory_value"]),
+        value=format_inr(kpis["current_inventory_value"], show_decimals=False),
         subtext="Available stock valuation at cost price",
         delta="In Warehouse",
         is_good=True

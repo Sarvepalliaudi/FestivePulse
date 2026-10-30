@@ -13,7 +13,8 @@ from services.ui_components import (
     apply_custom_css,
     render_festival_header,
     render_standard_sidebar,
-    render_empty_state
+    render_empty_state,
+    clean_html
 )
 from config import GST_SLABS, UNITS_OF_MEASURE, MASTER_FESTIVALS, REGIONS
 
@@ -320,7 +321,7 @@ with prod_tabs[3]:
 
         # Show reference audit
         refs = ProductRepository.get_product_reference_counts(target_m_id)
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div style="background: rgba(18, 24, 38, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
             <h4 style="margin: 0 0 0.5rem 0; color: #F8FAFC;">Audit Reference Status for {target_m['product_name']} ({target_m['sku']})</h4>
             <div style="display: flex; gap: 2rem;">
@@ -330,7 +331,7 @@ with prod_tabs[3]:
                 <div>Status: <b style="color: {'#34D399' if target_m['is_active'] else '#FB7185'};">{'ACTIVE' if target_m['is_active'] else 'DEACTIVATED'}</b></div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         col_act1, col_act2 = st.columns(2)
 

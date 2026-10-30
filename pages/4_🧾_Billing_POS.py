@@ -24,7 +24,8 @@ from services.ui_components import (
     apply_custom_css,
     render_festival_header,
     render_standard_sidebar,
-    render_empty_state
+    render_empty_state,
+    clean_html
 )
 
 st.set_page_config(page_title="Sales & POS — FestivePulse", page_icon="🧾", layout="wide")
@@ -198,7 +199,7 @@ with pos_tabs[0]:
         rounded_bill = round(final_bill)
         roundoff = round(rounded_bill - final_bill, 2)
 
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div style="background: rgba(18, 24, 38, 0.85); padding: 1.25rem; border-radius: 10px; border: 1px solid rgba(217, 119, 6, 0.3); margin: 1rem 0;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
                 <span style="color: #94A3B8;">Gross Items Subtotal:</span>
@@ -226,7 +227,7 @@ with pos_tabs[0]:
                 <span style="color: #34D399; font-size: 1.75rem; font-weight: 800;">{format_inr(rounded_bill)}</span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         if pay_mode == "UPI":
             st.info("📱 Prompt customer to scan QR code on counter / GPay / PhonePe / Paytm.")

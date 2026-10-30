@@ -50,12 +50,15 @@ default_occ = next((r["occurrence_id"] for _, r in occ_df.iterrows() if r["is_cu
 st.subheader("⚙️ Planning Parameters & Filters")
 col_sel1, col_sel2, col_sel3, col_sel4 = st.columns([1.6, 1.0, 1.0, 1.2])
 
+occ_keys = list(occ_options.keys())
+default_occ_idx = occ_keys.index(default_occ) if default_occ in occ_keys else 0
+
 with col_sel1:
     target_occ = st.selectbox(
         "Target Festival Campaign:",
-        options=list(occ_options.keys()),
+        options=occ_keys,
         format_func=lambda x: occ_options[x],
-        index=list(occ_options.keys()).index(default_occ)
+        index=default_occ_idx
     )
 
 with col_sel2:

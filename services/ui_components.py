@@ -14,6 +14,15 @@ DEVELOPER_NAME = "Audi Siva Bhanuvardhan Sarvepalli"
 LINKEDIN_URL = "https://www.linkedin.com/in/audi-siva-bhanuvardhan-sarvepalli-4598a8289/"
 
 
+def clean_html(raw_html: str) -> str:
+    """
+    Collapses multiline HTML into a clean single string without leading indentation,
+    preventing Streamlit/CommonMark parsers from misinterpreting indented lines
+    as code blocks (which caused literal </div> tags to leak into the UI).
+    """
+    return "".join(line.strip() for line in raw_html.strip().splitlines() if line.strip())
+
+
 def apply_custom_css():
     """
     Injects custom festive styles from assets/custom.css.
@@ -40,7 +49,7 @@ def render_festival_header():
         
         countdown_str = f"<b>{days_to_fest} Days to Festival</b>" if days_to_fest >= 0 else "<b>Festival Concluded</b>"
 
-        st.markdown(f"""
+        html_code = clean_html(f"""
         <div class="festival-hero-banner">
             <div>
                 <span class="festival-badge">Active Festival Campaign</span>
@@ -56,9 +65,10 @@ def render_festival_header():
                 <div style="font-size: 0.78rem; color: #CBD5E1;">{store_name}</div>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
+        st.markdown(html_code, unsafe_allow_html=True)
     else:
-        st.markdown(f"""
+        html_code = clean_html(f"""
         <div class="festival-hero-banner">
             <div>
                 <span class="festival-badge">Off-Season Mode</span>
@@ -70,7 +80,8 @@ def render_festival_header():
                 </span>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
+        st.markdown(html_code, unsafe_allow_html=True)
 
 
 def render_standard_sidebar():
@@ -90,7 +101,7 @@ def render_standard_sidebar():
 
     with st.sidebar:
         # 1. Store Header Card
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div class="sidebar-profile-card">
             <div style="font-size: 0.75rem; text-transform: uppercase; color: #D97706; font-weight: 700; letter-spacing: 0.05em;">
                 🏪 Active Store
@@ -105,7 +116,7 @@ def render_standard_sidebar():
                 📍 {region} India • {state}
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         # 2. Festival Campaign Status
         if fest:
@@ -118,7 +129,7 @@ def render_standard_sidebar():
         st.markdown("---")
 
         # 3. Developer & LinkedIn Credit Card
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div class="sidebar-footer-card">
             <div style="font-size: 0.72rem; text-transform: uppercase; color: #94A3B8; font-weight: 600; letter-spacing: 0.04em;">
                 Crafted for Indian Retailers
@@ -136,41 +147,58 @@ def render_standard_sidebar():
                 Connect on LinkedIn
             </a>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
 
 def render_kpi_card(label: str, value: str, subtext: str = "", delta: str = None, is_good: bool = True):
     """
-    Renders a styled metric card with clear typography and contrast.
+    Renders a styled metric card with clear typography, high contrast,
+    responsive sizing, and guaranteed HTML closing tags (never leaking </div> into the UI).
     """
+    raw_val = str(value).strip()
+    clean_val = raw_val
+
+    # Strip trailing .00 on large currency amounts (e.g. ₹2,88,465.00 -> ₹2,88,465)
+    # This prevents awkward line breaks where .00 wraps onto a separate line in tight card columns
+    if clean_val.endswith(".00") and any(ch.isdigit() for ch in clean_val):
+        prefix_part = clean_val[:-3]
+        digits_only = [c for c in prefix_part if c.isdigit()]
+        if len(digits_only) >= 3:
+            clean_val = prefix_part
+
     delta_html = ""
     if delta:
         delta_color = "#34D399" if is_good else "#FB7185"
-        delta_html = f"<span style='color: {delta_color}; font-size: 0.8rem; font-weight: 600;'>{delta}</span>"
+        delta_html = f'<span style="color: {delta_color}; font-size: 0.76rem; font-weight: 600; white-space: nowrap; flex-shrink: 0;">{delta}</span>'
 
-    st.markdown(f"""
+    subtext_html = ""
+    if subtext:
+        subtext_html = f'<div class="metric-subtext" title="{subtext}">{subtext}</div>'
+
+    card_html = clean_html(f"""
     <div class="metric-card">
-        <div class="metric-label">{label}</div>
-        <div class="metric-value">{value}</div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="metric-subtext">{subtext}</div>
+        <div class="metric-label" title="{label}">{label}</div>
+        <div class="metric-value" title="{raw_val}">{clean_val}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.4rem; min-width: 0; margin-top: 0.25rem;">
+            {subtext_html}
             {delta_html}
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """)
+    st.markdown(card_html, unsafe_allow_html=True)
 
 
 def render_empty_state(title: str, message: str, action_label: Optional[str] = None, action_page: Optional[str] = None, icon: str = "📭"):
     """
     Renders a clear, actionable empty state for nontechnical shopkeepers.
     """
-    st.markdown(f"""
+    st.markdown(clean_html(f"""
     <div class="empty-state-box">
         <div class="empty-state-icon">{icon}</div>
         <div class="empty-state-title">{title}</div>
         <div class="empty-state-text">{message}</div>
     </div>
-    """, unsafe_allow_html=True)
+    """), unsafe_allow_html=True)
     if action_label and action_page:
         col_c1, col_c2, col_c3 = st.columns([1, 1.2, 1])
         with col_c2:

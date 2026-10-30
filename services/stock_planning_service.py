@@ -54,6 +54,8 @@ def compute_product_stock_plan(
 
     Supports pack size rounding and preserves both original calculation and user overrides.
     """
+    p_id = int(product_id)
+    occ_id = int(occurrence_id)
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
@@ -66,7 +68,7 @@ def compute_product_stock_plan(
             FROM products p
             JOIN product_categories c ON p.category_id = c.category_id
             WHERE p.product_id = ?
-        """, (product_id,))
+        """, (p_id,))
         p = cursor.fetchone()
         if not p:
             raise ValueError(f"Product ID {product_id} not found.")
@@ -78,15 +80,15 @@ def compute_product_stock_plan(
             JOIN suppliers s ON b.supplier_id = s.supplier_id
             WHERE b.product_id = ?
             ORDER BY b.received_date DESC LIMIT 1
-        """, (product_id,))
+        """, (p_id,))
         sup_row = cursor.fetchone()
         supplier_name = sup_row["supplier_name"] if sup_row else "Primary Distributor"
         lead_time_days = int(sup_row["average_lead_time_days"]) if sup_row else 7
 
         # 2. Demand Estimation
         demand_est = estimate_product_demand(
-            product_id=product_id,
-            target_occurrence_id=occurrence_id,
+            product_id=p_id,
+            target_occurrence_id=occ_id,
             growth_multiplier=growth_multiplier,
             manual_daily_estimate=manual_demand_override,
             trim_spikes=trim_spikes
@@ -97,7 +99,7 @@ def compute_product_stock_plan(
         demand_status_label = demand_est.get("status_label", "⚠️ Insufficient historical data")
 
         # 3. Existing Usable Stock (Unexpired stock on hand)
-        usable_stock = get_usable_stock(product_id)
+        usable_stock = get_usable_stock(p_id)
 
         # 4. Explicitly Configured Safety Stock
         # If user explicitly provides safety stock in plan, use that; otherwise use p.min_safety_stock

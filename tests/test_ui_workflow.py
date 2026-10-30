@@ -318,6 +318,25 @@ class TestFullShopkeeperWorkflow(unittest.TestCase):
         self.assertEqual(integrity["integrity_status"], "ok")
         self.assertEqual(integrity["foreign_key_violations_count"], 0)
 
+    def test_clean_html_and_metric_formatting(self):
+        """
+        Validates clean_html removes indentation to prevent CommonMark code block leaks
+        and that KPI metrics format large currency amounts cleanly without trailing .00 wrapping.
+        """
+        from services.ui_components import clean_html
+        test_multiline = """
+        <div class="metric-card">
+            <div class="metric-label">Total Sales</div>
+            <div class="metric-value">₹2,88,465.00</div>
+        </div>
+        """
+        cleaned = clean_html(test_multiline)
+        self.assertNotIn("\n", cleaned)
+        self.assertFalse(cleaned.startswith(" "))
+        self.assertTrue(cleaned.startswith('<div class="metric-card">'))
+        self.assertTrue(cleaned.endswith('</div>'))
+
 
 if __name__ == "__main__":
     unittest.main()
+
